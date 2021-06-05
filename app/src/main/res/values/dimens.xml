@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="et_width">250dp</dimen>
+    <dimen name="btn_margin_top">30dp</dimen>
+    <dimen name="btn_width">150dp</dimen>
+</resources>
