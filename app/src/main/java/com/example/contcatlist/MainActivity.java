@@ -1,12 +1,5 @@
 package com.example.contcatlist;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -19,95 +12,78 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.CallLog;
-import android.telecom.Call;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.contcatlist.database.SQLiteDatabaseHandler;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.contcatlist.database.CallHistorySQLiteDbHandler;
 import com.example.contcatlist.model.CallRecord;
 import com.example.contcatlist.view.CallRCVAdapter;
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
     private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 1;
-    TextView textView;
     Button btnCall, btnCallLogs;
     EditText etPhoneNumber;
     Activity activity;
-    ArrayList countries;
-    SQLiteDatabaseHandler db;
+    CallHistorySQLiteDbHandler db;
     RecyclerView rcv;
-    Boolean callInitiated = false;
 
     @SuppressLint("NewApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+//        Views declarations
         btnCall = findViewById(R.id.btnCall);
         btnCallLogs = findViewById(R.id.btnCallLogs);
         etPhoneNumber = findViewById(R.id.etPhoneNumber);
         rcv = findViewById(R.id.rcvCallList);
 
-
+//        SQLite DB initialization
         activity = this;
-        db = new SQLiteDatabaseHandler(this);
+        db = new CallHistorySQLiteDbHandler(this);
 
+//        RecyclerView
         rcv.hasFixedSize();
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(MainActivity.this);
         rcv.setLayoutManager(linearLayoutManager);
-
+//      check and request run-time permissions
         requestContactPermission();
 
-        btnCall.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String number = etPhoneNumber.getText().toString();
-                if (number.length() == 10) {
-                    startActivity(new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + number)));
-                    callInitiated = true;
-                } else {
-                    etPhoneNumber.setError("Please enter 10 digit mobile number");
-                }
+//        Call and Call Logs OnClick listeners
+        btnCall.setOnClickListener(v -> {
+            String number = etPhoneNumber.getText().toString();
+            if (number.length() == 10) {
+                startActivity(new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + number)));
+            } else {
+                etPhoneNumber.setError("Please enter valid 10 digit mobile number");
             }
         });
-        btnCallLogs.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                lastCall();
-            }
-        });
-
+        btnCallLogs.setOnClickListener(v -> getCallHistoryRecords());
     }
 
-    @Override
-    protected void onResume() {
-        if (callInitiated) {
-//            lastCall();
-        }
-        super.onResume();
-    }
-
-    public void lastCall() {
-
+    public void getCallHistoryRecords() {
         Uri contacts = CallLog.Calls.CONTENT_URI;
-
         try {
+
             Cursor managedCursor = MainActivity.this.getContentResolver().query(contacts, null, null, null, android.provider.CallLog.Calls.DATE + " DESC limit 10;");
+
             int number = managedCursor.getColumnIndex(CallLog.Calls.NUMBER);
             int duration = managedCursor.getColumnIndex(CallLog.Calls.DURATION);
             int date = managedCursor.getColumnIndex(CallLog.Calls.DATE);
 
             if (managedCursor.getCount() > 0) {
-
                 db.deleteAllCallRecords();
                 while (managedCursor.moveToNext()) {
                     String callDate = managedCursor.getString(date);
@@ -122,14 +98,13 @@ public class MainActivity extends AppCompatActivity {
                 getCallRecordsFromDB();
             } else {
                 Log.d("##Log", "No Call logs found");
+                Toast.makeText(this, "No call logs found", Toast.LENGTH_SHORT).show();
             }
             managedCursor.close();
         } catch (SecurityException e) {
             Log.e("Security Exception", e.toString());
-
+            Toast.makeText(this, "Security Exception: " + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
         }
-
-
     }
 
     private void getCallRecordsFromDB() {
@@ -155,29 +130,18 @@ public class MainActivity extends AppCompatActivity {
                     });
                     builder.show();
                 } else {
-                    ActivityCompat.requestPermissions(this,
-                            new String[]{Manifest.permission.CALL_PHONE, Manifest.permission.READ_CONTACTS, Manifest.permission.READ_CALL_LOG},
-                            PERMISSIONS_REQUEST_READ_CONTACTS);
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CALL_PHONE, Manifest.permission.READ_CONTACTS, Manifest.permission.READ_CALL_LOG}, PERMISSIONS_REQUEST_READ_CONTACTS);
                 }
-            } else {
-//                lastCall();
             }
-        } else {
-//            lastCall();
         }
-
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST_READ_CONTACTS: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                    lastCall();
-                } else {
-                    Toast.makeText(this, "You have disabled a contacts permission", Toast.LENGTH_LONG).show();
-                }
-                return;
+        if (requestCode == PERMISSIONS_REQUEST_READ_CONTACTS) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            } else {
+                Toast.makeText(this, "You have disabled a contacts permission", Toast.LENGTH_LONG).show();
             }
         }
     }

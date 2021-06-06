@@ -3,4 +3,6 @@
     <string name="str_phone_hint">Enter phone number here</string>
     <string name="call">Call</string>
     <string name="call_logs">Call Logs</string>
+    <string name="phone_number_text">Phone Number</string>
+    <string name="duration_sec">000 sec</string>
 </resources>

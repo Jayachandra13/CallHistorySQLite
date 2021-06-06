@@ -13,7 +13,7 @@ import com.example.contcatlist.model.CallRecord;
 
 import java.util.ArrayList;
 
-public class SQLiteDatabaseHandler extends SQLiteOpenHelper {
+public class CallHistorySQLiteDbHandler extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "CallDB";
@@ -24,7 +24,7 @@ public class SQLiteDatabaseHandler extends SQLiteOpenHelper {
     private static final String COLUMN_DURATION = "Duration";
 
     @RequiresApi(api = Build.VERSION_CODES.P)
-    public SQLiteDatabaseHandler(Context context) {
+    public CallHistorySQLiteDbHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -72,7 +72,7 @@ public class SQLiteDatabaseHandler extends SQLiteOpenHelper {
 
     public void deleteAllCallRecords() {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_CALL_LIST,null,null);
+        db.delete(TABLE_CALL_LIST, null, null);
         db.close();
     }
 }

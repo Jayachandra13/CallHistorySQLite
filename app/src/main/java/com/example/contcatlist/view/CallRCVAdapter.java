@@ -35,10 +35,8 @@ public class CallRCVAdapter extends RecyclerView.Adapter<CallRCVAdapter.CallList
     @Override
     public void onBindViewHolder(CallRCVAdapter.CallListVH holder, int position) {
         if (holder != null) {
-            CallRecord callRecord = list.get(position);
-            CallListVH callListVH = (CallListVH) holder;
-            callListVH.tvPhoneNumber.setText(list.get(position).getPhoneNumber());
-            callListVH.tvDuration.setText("" + list.get(position).getDuration()+" sec");
+            holder.tvPhoneNumber.setText(list.get(position).getPhoneNumber());
+            holder.tvDuration.setText("" + list.get(position).getDuration() + " sec");
         }
     }
 
@@ -53,8 +51,8 @@ public class CallRCVAdapter extends RecyclerView.Adapter<CallRCVAdapter.CallList
 
         public CallListVH(View itemView) {
             super(itemView);
-            tvPhoneNumber = (TextView) itemView.findViewById(R.id.tvPhoneNumber);
-            tvDuration = (TextView) itemView.findViewById(R.id.tvDuration);
+            tvPhoneNumber = itemView.findViewById(R.id.tvPhoneNumber);
+            tvDuration = itemView.findViewById(R.id.tvDuration);
         }
     }
 }
