@@ -28,7 +28,10 @@ import com.example.contcatlist.database.CallHistorySQLiteDbHandler;
 import com.example.contcatlist.model.CallRecord;
 import com.example.contcatlist.view.CallRCVAdapter;
 
+import java.security.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
     private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 1;
@@ -58,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
         rcv.hasFixedSize();
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(MainActivity.this);
         rcv.setLayoutManager(linearLayoutManager);
+
 //      check and request run-time permissions
         requestContactPermission();
 
@@ -86,13 +90,19 @@ public class MainActivity extends AppCompatActivity {
             if (managedCursor.getCount() > 0) {
                 db.deleteAllCallRecords();
                 while (managedCursor.moveToNext()) {
+
                     String callDate = managedCursor.getString(date);
+                    Log.v("callStart:","callDate->"+getDate(Long.parseLong(callDate)));
                     String callDuration = managedCursor.getString(duration);
+                    Long endTime = addTimeStamp(Long.parseLong(callDate),Integer.parseInt(callDuration));
+                    Log.v("callEnd:","callDate->"+getDate(endTime));
                     String phNumber = managedCursor.getString(number);
                     Log.d("##Log", phNumber + " " + " " + callDuration);
                     CallRecord mCallRecord = new CallRecord();
                     mCallRecord.setPhoneNumber(phNumber);
                     mCallRecord.setDuration(Long.parseLong(callDuration));
+                    mCallRecord.setStartTime(getDate(Long.parseLong(callDate)));
+                    mCallRecord.setEndTime(getDate(endTime));
                     db.addCallRecord(mCallRecord);
                 }
                 getCallRecordsFromDB();
@@ -106,7 +116,18 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "Security Exception: " + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
         }
     }
-
+    public String getDate(long milliSeconds) {
+        SimpleDateFormat formatter = new SimpleDateFormat("d MMM yyyy hh:mm:ss a");
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(milliSeconds);
+        return formatter.format(calendar.getTime());
+    }
+    public Long addTimeStamp(Long startDate, Integer durationSec){
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(startDate);
+        cal.add(Calendar.SECOND, durationSec);
+        return cal.getTimeInMillis();
+    }
     private void getCallRecordsFromDB() {
         ArrayList<CallRecord> list = db.getAllCallRecords();
         rcv.setAdapter(new CallRCVAdapter(this, list, rcv));

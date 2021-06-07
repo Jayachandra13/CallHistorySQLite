@@ -22,6 +22,8 @@ public class CallHistorySQLiteDbHandler extends SQLiteOpenHelper {
     private static final String COLUMN_KEY_ID = "id";
     private static final String COLUMN_PHONE = "PhoneNumber";
     private static final String COLUMN_DURATION = "Duration";
+    private static final String COLUMN_START_TIME = "StartTime";
+    private static final String COLUMN_END_TIME = "EndTime";
 
     @RequiresApi(api = Build.VERSION_CODES.P)
     public CallHistorySQLiteDbHandler(Context context) {
@@ -32,7 +34,7 @@ public class CallHistorySQLiteDbHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String CREATE_COUNTRY_TABLE = "CREATE TABLE " + TABLE_CALL_LIST + "("
                 + COLUMN_KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + COLUMN_PHONE + " TEXT,"
-                + COLUMN_DURATION + " LONG" + ")";
+                + COLUMN_DURATION + " LONG," + COLUMN_START_TIME + " TEXT," + COLUMN_END_TIME + " TEXT" + ")";
         db.execSQL(CREATE_COUNTRY_TABLE);
     }
 
@@ -48,6 +50,8 @@ public class CallHistorySQLiteDbHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(COLUMN_PHONE, callRecord.getPhoneNumber());
         values.put(COLUMN_DURATION, callRecord.getDuration());
+        values.put(COLUMN_START_TIME, callRecord.getStartTime());
+        values.put(COLUMN_END_TIME, callRecord.getEndTime());
 
         db.insert(TABLE_CALL_LIST, null, values);
         db.close();
@@ -64,6 +68,8 @@ public class CallHistorySQLiteDbHandler extends SQLiteOpenHelper {
                 CallRecord callRecord = new CallRecord();
                 callRecord.setPhoneNumber(cursor.getString(1));
                 callRecord.setDuration(cursor.getLong(2));
+                callRecord.setStartTime(cursor.getString(3));
+                callRecord.setEndTime(cursor.getString(4));
                 callList.add(callRecord);
             } while (cursor.moveToNext());
         }

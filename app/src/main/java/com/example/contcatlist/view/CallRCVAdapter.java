@@ -37,6 +37,8 @@ public class CallRCVAdapter extends RecyclerView.Adapter<CallRCVAdapter.CallList
         if (holder != null) {
             holder.tvPhoneNumber.setText(list.get(position).getPhoneNumber());
             holder.tvDuration.setText("" + list.get(position).getDuration() + " sec");
+            holder.tvStartDT.setText("Call Started at : " + list.get(position).getStartTime());
+            holder.tvEndDT.setText("Call Ended at: " + list.get(position).getEndTime());
         }
     }
 
@@ -48,11 +50,15 @@ public class CallRCVAdapter extends RecyclerView.Adapter<CallRCVAdapter.CallList
     public class CallListVH extends RecyclerView.ViewHolder {
         TextView tvPhoneNumber;
         TextView tvDuration;
+        TextView tvStartDT;
+        TextView tvEndDT;
 
         public CallListVH(View itemView) {
             super(itemView);
             tvPhoneNumber = itemView.findViewById(R.id.tvPhoneNumber);
             tvDuration = itemView.findViewById(R.id.tvDuration);
+            tvStartDT = itemView.findViewById(R.id.tvStartDT);
+            tvEndDT = itemView.findViewById(R.id.tvEndDT);
         }
     }
 }

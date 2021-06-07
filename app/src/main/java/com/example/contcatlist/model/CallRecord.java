@@ -4,6 +4,25 @@ public class CallRecord {
     String phoneNumber;
     Long duration;
 
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
+
+    String startTime;
+    String endTime;
+
     public String getPhoneNumber() {
         return phoneNumber;
     }
